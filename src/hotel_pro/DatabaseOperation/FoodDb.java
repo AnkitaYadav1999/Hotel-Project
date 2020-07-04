@@ -2,10 +2,13 @@
 package hotel_pro.DatabaseOperation;
 
 import hotel_pro.Classes.Food;
+import hotel_pro.UI.FoodEntity;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JOptionPane;
 
 
@@ -36,6 +39,27 @@ public class FoodDb {
         {
             flushStatmentOnly();
         }
+    }
+     
+     public List<FoodEntity> getFoodItems() {
+        List<FoodEntity> foodItems = new ArrayList<>();
+
+        try {
+            String query = "select * from food";
+            statement = conn.prepareStatement(query);
+            result = statement.executeQuery();
+            while(result.next()){
+                FoodEntity foodEntity = new FoodEntity(
+                        result.getInt("food_id"),
+                        result.getString("name"),
+                        result.getDouble("price"));
+                foodItems.add(foodEntity);
+            }
+            result.close();
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, ex.toString() + "\n error coming from returning all food DB Operation");
+        }
+        return foodItems;
     }
 
     public ResultSet getFoods() {

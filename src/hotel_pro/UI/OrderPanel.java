@@ -13,11 +13,14 @@ import hotel_pro.DatabaseOperation.FoodDb;
 
 import hotel_pro.DatabaseOperation.OrderDb;
 import java.awt.Color;
+import java.awt.event.ItemEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.print.Book;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
@@ -35,10 +38,11 @@ public class OrderPanel extends javax.swing.JDialog {
      * Creates new form OrderPanel
      */
     
-    Vector<String> bookingList = new Vector();
     BookingDb db = new BookingDb();
     ResultSet result;
+    List<FoodEntity> foodItems = new ArrayList<>();
     FoodDb foodDb = new FoodDb();
+    
     
   //  OrderDb orderDb = new OrderDb();
     public OrderPanel(java.awt.Frame parent, boolean modal) {
@@ -46,84 +50,24 @@ public class OrderPanel extends javax.swing.JDialog {
         initComponents();
         this.getContentPane().setBackground(new Color(241,241,242));
         searchHelper();
-        populateFoodTable();
+        populateFoodCombobox();
         
-        AutoCompleteDecorator.decorate(combo_booking);
+    }
+    
+    private void populateFoodCombobox(){
+        foodsCmbBx.removeAllItems();
+        foodItems = foodDb.getFoodItems();
+        for(FoodEntity entity: foodItems){
+            foodsCmbBx.addItem(entity.getName());
+        }
     }
     
     public void searchHelper()
     {
-         final DefaultComboBoxModel model = new DefaultComboBoxModel(bookingList);
-        combo_booking.setModel(model);
-        
-        
-        JTextComponent editor = (JTextComponent) combo_booking.getEditor().getEditorComponent();
-        editor.addKeyListener(new KeyAdapter() {
-
-            @Override
-            public void keyTyped(KeyEvent evt)
-            {
-               
-                if(evt.getKeyChar() == KeyEvent.VK_ENTER)
-                {
-                    String details = (String) combo_booking.getSelectedItem();
-                    //System.out.println(details);
-                    if(!details.contains(","))
-                    {
-                        JOptionPane.showMessageDialog(null, "no booking found, try adding a new booking");
-                    }
-                    else
-                    {
-                        int bookinId = Integer.parseInt(details.substring(details.lastIndexOf(",")+1));
-                        tf_bookingId.setText(bookinId+"");
-                        // A if condition should be here, but not required as the last line has no chance of returning -1.
-                        
-                    }
-                    
-                }
-                
-                
-                
-                /// suggestion generation
-                
-                 String value = "";
-                try {
-                    value = combo_booking.getEditor().getItem().toString();
-                       // System.out.println(value +" <<<<<<<<<<<<<");
-
-                } catch (Exception ex) {
-                }
-                if (value.length() >= 2) {
-
-                   // System.out.println("working");
-                  //  bookingComboFill(db.bookingsReadyForOrder(value));
-                    db.flushAll();
-                }
-
-            }
-        });
+ 
     }
     
-    public void bookingComboFill(ResultSet result)
-    {
-        bookingList.clear();
-        try {
-            
-            while (result.next()) {
-               // System.out.println(">>>>>> "+result.getString("name"));
-                bookingList.add(result.getString("booking_id"));
-            }
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, "bookingCombo fill error");
-        }
-
-    }
-    
-     private void populateFoodTable() {
-        result = foodDb.getFoods();
-        table_food.setModel(DbUtils.resultSetToTableModel(result));
-        foodDb.flushAll();
-    }
+   
      
 
 
@@ -136,6 +80,11 @@ public class OrderPanel extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        entityManager = java.beans.Beans.isDesignTime() ? null : javax.persistence.Persistence.createEntityManagerFactory("hotel?zeroDateTimeBehavior=convertToNullPU").createEntityManager();
+        bookingQuery = java.beans.Beans.isDesignTime() ? null : entityManager.createQuery("SELECT b FROM Booking b");
+        bookingList = java.beans.Beans.isDesignTime() ? java.util.Collections.emptyList() : bookingQuery.getResultList();
+        foodQuery = java.beans.Beans.isDesignTime() ? null : entityManager.createQuery("SELECT f FROM Food f");
+        foodList = java.beans.Beans.isDesignTime() ? java.util.Collections.emptyList() : foodQuery.getResultList();
         jScrollPane1 = new javax.swing.JScrollPane();
         table_food = new javax.swing.JTable();
         jPanel1 = new javax.swing.JPanel();
@@ -146,10 +95,10 @@ public class OrderPanel extends javax.swing.JDialog {
         tf_price = new javax.swing.JTextField();
         tf_total = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
-        tf_bookingId = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
-        combo_booking = new javax.swing.JComboBox();
         jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
+        foodsCmbBx = new javax.swing.JComboBox();
         jLabel5 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -164,9 +113,24 @@ public class OrderPanel extends javax.swing.JDialog {
                 {null, null, null, null}
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "No", "Name", "Quantity", "Rate"
             }
-        ));
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, true, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         table_food.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 table_foodMouseClicked(evt);
@@ -197,21 +161,27 @@ public class OrderPanel extends javax.swing.JDialog {
 
         jLabel3.setText("Total");
 
-        tf_bookingId.setBackground(new java.awt.Color(204, 255, 0));
-
         jLabel4.setText("Price");
 
-        combo_booking.setEditable(true);
-        combo_booking.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                combo_bookingActionPerformed(evt);
-            }
-        });
-
-        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/SaveButton.png"))); // NOI18N
+        jButton1.setText("Add");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
+            }
+        });
+
+        jButton2.setBackground(new java.awt.Color(0, 204, 204));
+        jButton2.setText("Submit Order");
+
+        foodsCmbBx.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        foodsCmbBx.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                foodsCmbBxItemStateChanged(evt);
+            }
+        });
+        foodsCmbBx.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                foodsCmbBxActionPerformed(evt);
             }
         });
 
@@ -220,33 +190,37 @@ public class OrderPanel extends javax.swing.JDialog {
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButton1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(combo_booking, javax.swing.GroupLayout.Alignment.TRAILING, 0, 0, Short.MAX_VALUE)
-                            .addComponent(tf_bookingId)
-                            .addComponent(tf_foodItem)
-                            .addComponent(tf_quantity)
-                            .addComponent(tf_total)
-                            .addComponent(tf_price, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 110, Short.MAX_VALUE))))
-                .addContainerGap(32, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                            .addContainerGap()
+                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGap(18, 18, 18)
+                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(tf_foodItem)
+                                .addComponent(tf_quantity)
+                                .addComponent(tf_total)
+                                .addComponent(tf_price, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 110, Short.MAX_VALUE)))
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                            .addGap(35, 35, 35)
+                            .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 25, Short.MAX_VALUE)
+                            .addComponent(jButton2)))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(foodsCmbBx, javax.swing.GroupLayout.PREFERRED_SIZE, 208, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(combo_booking, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(61, 61, 61)
+                .addComponent(foodsCmbBx, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(tf_bookingId, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(19, 19, 19)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(tf_foodItem, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -262,9 +236,11 @@ public class OrderPanel extends javax.swing.JDialog {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
                     .addComponent(tf_total, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(91, Short.MAX_VALUE))
+                .addGap(27, 27, 27)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton2))
+                .addContainerGap(82, Short.MAX_VALUE))
         );
 
         jLabel5.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
@@ -315,14 +291,7 @@ public class OrderPanel extends javax.swing.JDialog {
     }//GEN-LAST:event_tf_quantityKeyReleased
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        db.insertOrder(new Order(
-                Integer.parseInt(tf_bookingId.getText()),
-                tf_foodItem.getText(),
-                Integer.parseInt(tf_price.getText()),
-                Integer.parseInt(tf_quantity.getText()),
-                Integer.parseInt(tf_total.getText())
-                
-        ));
+        
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void tf_priceKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tf_priceKeyTyped
@@ -343,10 +312,28 @@ public class OrderPanel extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_tf_quantityKeyTyped
 
-    private void combo_bookingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_combo_bookingActionPerformed
+    private void foodsCmbBxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_foodsCmbBxActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_combo_bookingActionPerformed
+        System.out.println("CMB ITEM SELECTED");
+    }//GEN-LAST:event_foodsCmbBxActionPerformed
 
+    private void foodsCmbBxItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_foodsCmbBxItemStateChanged
+        // TODO add your handling code here:
+          if(evt.getStateChange() == ItemEvent.SELECTED){
+            String selectedFoodName = (String)evt.getItem();
+            FoodEntity searchFood = searchFood(selectedFoodName); 
+            tf_foodItem.setText(searchFood.getName());
+            tf_price.setText(""+searchFood.getRate());
+         }
+    }//GEN-LAST:event_foodsCmbBxItemStateChanged
+    private FoodEntity searchFood(String selectedFood) {
+        for(FoodEntity entity: foodItems){
+            if(selectedFood.equalsIgnoreCase(entity.getName())){
+                return entity;
+            }
+        }
+        return null;
+    }
     
      private void displayToTextField(int row) {
         tf_foodItem.setText(table_food.getModel().getValueAt(row, 1)+"");
@@ -397,8 +384,14 @@ public class OrderPanel extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox combo_booking;
+    private java.util.List<hotel_pro.UI.Booking> bookingList;
+    private javax.persistence.Query bookingQuery;
+    private javax.persistence.EntityManager entityManager;
+    private java.util.List<hotel_pro.UI.Food> foodList;
+    private javax.persistence.Query foodQuery;
+    private javax.swing.JComboBox foodsCmbBx;
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -407,12 +400,13 @@ public class OrderPanel extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable table_food;
-    private javax.swing.JTextField tf_bookingId;
     private javax.swing.JTextField tf_foodItem;
     private javax.swing.JTextField tf_price;
     private javax.swing.JTextField tf_quantity;
     private javax.swing.JTextField tf_total;
     // End of variables declaration//GEN-END:variables
+
+    
 
    
 }
