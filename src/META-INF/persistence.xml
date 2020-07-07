@@ -5,6 +5,7 @@
     <class>hotel_pro.UI.Booking</class>
     <class>hotel_pro.UI.Food</class>
     <class>hotel_pro.UI.FoodEntity</class>
+    <class>hotel_pro.TestTest</class>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/hotel?zeroDateTimeBehavior=convertToNull"/>
       <property name="javax.persistence.jdbc.user" value="root"/>
