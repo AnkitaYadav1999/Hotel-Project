@@ -17,7 +17,7 @@ public class Payment {
     public Payment(Order b)
     {
         ordering = b;
-        //totalRentPrice = b.getRoomsFare() * 1;
+      
         
     }
 

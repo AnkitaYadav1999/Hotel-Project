@@ -21,11 +21,11 @@ public class FoodDb {
      public void insertFood(Food food) {
         try {
             
-//            sql="INSERT INTO userinfo(Name,city)"+"VALUES ('"+unm+"','"+city+"')";
-               String insertFood ="INSERT INTO food(name,price)"+"VALUES ('"+ food.getName() +"','"+ food.getPrice() +"')";
- //           String insertFood = "insert into food('name','price') values('" + food.getName() + "'," + food.getPrice() + ")";
 
-            // System.out.println(">>>>>>>>>> "+ insertRoomTypeQuery);
+               String insertFood ="INSERT INTO food(name,price)"+"VALUES ('"+ food.getName() +"','"+ food.getPrice() +"')";
+ 
+
+            
             statement = conn.prepareStatement(insertFood);
 
             statement.execute();
@@ -79,7 +79,7 @@ public class FoodDb {
         try {
             String updateFood = "update food set name= '" + food.getName() + "', price= " + food.getPrice() + " where food_id = " + food.getFood_id();
 
-            // System.out.println(">>>>>>>>>> "+ insertRoomTypeQuery);
+            
             statement = conn.prepareStatement(updateFood);
 
             statement.execute();

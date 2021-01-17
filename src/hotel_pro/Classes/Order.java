@@ -6,6 +6,7 @@ public class Order {
     int orderId;
     int bookingId;
     String foodItem;
+    String dateOrder;
     int price;
     int quantity;
     int total;
@@ -17,6 +18,7 @@ public class Order {
         price = p;
         quantity = q;
         total = t;
+        
     }
     
     public int getOrderId() {

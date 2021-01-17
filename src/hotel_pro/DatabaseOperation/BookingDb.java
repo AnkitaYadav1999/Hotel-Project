@@ -18,31 +18,12 @@ public class BookingDb {
         conn = DataBaseConnection.connectTODB();        
     }
    
-    public void insertOrder(Order order) {
-        try {
-
-            String insertOrder = "INSERT INTO orderItem(booking_id,item_food,price,quantity,total)"+"VALUES('" + order.getBookingId() + "','" + order.getFoodItem() + "','" + order.getPrice() + "','" + order.getQuantity() + "','" + order.getTotal() + "')";
-
-            statement = conn.prepareStatement(insertOrder);
-            System.out.println(">>>>>>>>>> " + insertOrder);
-            statement.execute();
-
-            JOptionPane.showMessageDialog(null, "successfully inserted a new Order");
-
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, ex.toString() + "\n" + "Order Failed");
-        } finally {
-            flushStatementOnly();
-        }
-
-    }
-
-    
+   
     public ResultSet getABooking(int bookingId) {
         try {
 //            String query = "select * from booking where booking_id = " + bookingId;
 //            String query = "select * from orderItem where booking_id='"+bookingId+"'";
-             String query = "select booking_id from orderItem";
+             String query = "select order_id from order_item";
             statement = conn.prepareStatement(query);
             result = statement.executeQuery();
         } catch (SQLException ex) {
@@ -52,12 +33,27 @@ public class BookingDb {
         return result;
     }
     
+    public ResultSet getAllOrder() {
+        try {
+
+            String query = "select * from order_item";
+       
+            statement = conn.prepareStatement(query);
+            result = statement.executeQuery();
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, ex.toString() + "\n error coming from returning A booking DB Operation");
+        }
+
+        return result;
+    }
+    
+    
     public ResultSet getAllPaymentInfo(int bookingId)
     {
         try {
 //String sql="select * from userreg where username='"+unm+"' and password='"+pwd+"'";
 //            String query = "select * from orderItem where booking_id=" + bookingId;
-            String query = "select * from orderItem where booking_id='"+bookingId+"'";
+            String query = "select * from order_item where order_id='"+bookingId+"'";
             System.out.println(query);
             statement = conn.prepareStatement(query);
             result = statement.executeQuery();
@@ -74,7 +70,7 @@ public ResultSet bookingsReadyForOrder() {
            // flushAll();
 //            String query = "select * from orderItem where booking_id='"+bookingId+"'";
 //            String query = "select booking_id,booking_room,name from booking join userInfo on booking.customer_id = userInfo.user_id where booking_room like '%" + roomName + "%' and has_checked_out = 0 order by booking_id desc";
-            String query = "select booking_id from orderItem";
+            String query = "select order_id from order_item";
             System.out.println(query);
             statement = conn.prepareStatement(query);
             result = statement.executeQuery();

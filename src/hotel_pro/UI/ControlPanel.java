@@ -83,7 +83,6 @@ public class ControlPanel extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Welcome To Hotel");
-        setResizable(false);
 
         panel_container.setBackground(new java.awt.Color(241, 241, 242));
 
@@ -153,6 +152,11 @@ public class ControlPanel extends javax.swing.JFrame {
         jButton3.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButton3.setMargin(new java.awt.Insets(2, 15, 15, 14));
         jButton3.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
         jToolBar1.add(jButton3);
         jToolBar1.add(jSeparator4);
 
@@ -246,23 +250,6 @@ public class ControlPanel extends javax.swing.JFrame {
 
      
 
-    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        // true params block the parents to work
-        OrderPanel c = new OrderPanel(this, true);
-        c.setVisible(true);
-    }//GEN-LAST:event_jButton4ActionPerformed
-
-    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-        FoodPanel f = new FoodPanel(this, true);
-        f.setVisible(true);
-
-    }//GEN-LAST:event_jButton5ActionPerformed
-
-    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
-        PaymentPanel p = new PaymentPanel(this, true);
-        p.setVisible(true);
-    }//GEN-LAST:event_jButton6ActionPerformed
-
 /*
     private void date_checkInPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_date_checkInPropertyChange
         if (date_checkIn.getDate() != null) {
@@ -285,6 +272,27 @@ public class ControlPanel extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_date_checkInPropertyChange
 */
+    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+        PaymentPanel p = new PaymentPanel(this, true);
+        p.setVisible(true);
+    }//GEN-LAST:event_jButton6ActionPerformed
+
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        FoodPanel f = new FoodPanel(this, true);
+        f.setVisible(true);
+    }//GEN-LAST:event_jButton5ActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        // true params block the parents to work
+        OrderPanel c = new OrderPanel(this, true);
+        c.setVisible(true);
+    }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        LogPanel l = new LogPanel(this, true);
+        l.setVisible(true);
+    }//GEN-LAST:event_jButton3ActionPerformed
+
     
 
 
